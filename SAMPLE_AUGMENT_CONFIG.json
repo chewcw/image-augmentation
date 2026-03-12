@@ -1,0 +1,30 @@
+{
+  "rotation": {
+    "degrees": { "min": -5, "max": 5 },
+    "fill_color": [0, 0, 0]
+  },
+  "brightness": {
+    "factor": { "min": 0.9, "max": 1.1 }
+  },
+  "blur": {
+    "kernel": { "min": 1, "max": 5 },
+    "sigma": { "min": 0.0, "max": 1.0 }
+  },
+  "color_variation": {
+    "ranges": [
+      {
+        "hsv_min": [0, 80, 50],
+        "hsv_max": [10, 255, 255],
+        "hue_shift": { "min": -5, "max": 5 },
+        "sat_mult": { "min": 0.9, "max": 1.1 },
+        "val_mult": { "min": 0.9, "max": 1.1 }
+      }
+    ]
+  },
+  "object_removal": {
+    "mask_path": "masks/remove.png",
+    "radius": { "min": 3, "max": 7 },
+    "threshold": 128,
+    "invert_mask": false
+  }
+}
