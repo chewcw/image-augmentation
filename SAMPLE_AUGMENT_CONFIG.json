@@ -26,5 +26,11 @@
     "radius": { "min": 3, "max": 7 },
     "threshold": 128,
     "invert_mask": false
+  },
+  "cutout": {
+    "mask_path": "masks/cutout.png",
+    "threshold": 128,
+    "invert_mask": false,
+    "fill_color": [0, 0, 0]
   }
 }

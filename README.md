@@ -104,6 +104,25 @@ Notes:
 - `neighbor_fill` fills with mean/median color from a ring around the mask; `neighbor_ring_px` controls ring thickness; `neighbor_fill_mode` is `mean` or `median`.
 - `blur_fill` replaces the masked region with a heavily blurred version of the image; `blur_kernel` applies.
 
+### cutout (mask + solid fill)
+
+```json
+{
+  "cutout": {
+    "mask_path": "masks/cutout.png",
+    "threshold": 128,
+    "invert_mask": false,
+    "fill_color": [0, 0, 0]
+  }
+}
+```
+
+Notes:
+- `mask_path` can be absolute or relative to the config file location.
+- Mask is grayscale; pixels >= `threshold` are replaced with `fill_color`.
+- `invert_mask` flips which pixels are cut out.
+- `fill_color` is BGR and defaults to black.
+
 ## HSV Range Picker GUI
 
 Select an ROI on an image and output a ready-to-paste `color_variation` range.
@@ -161,6 +180,34 @@ Tips:
 - `+` / `-`: zoom in / out.
 - `[` / `]`: decrease / increase brush size.
 - `r`: reset mask.
+- `s`: save mask and exit.
+- `q` or `ESC`: quit without saving.
+
+## Cutout Mask Painter GUI
+
+Select a rectangle ROI and refine a cutout mask (white = cut out, black = keep).
+
+```bash
+python augmentation-tools/cutout_mask_painter.py --input ok.jpg --output masks/cutout.png --mode rect
+```
+
+Brush-only mode:
+
+```bash
+python augmentation-tools/cutout_mask_painter.py --input ok.jpg --output masks/cutout.png --mode brush
+```
+
+Tips (rect mode):
+- Select a rectangle ROI (press ENTER to confirm, ESC to cancel).
+- Mask is saved immediately after ROI selection.
+
+Tips (brush mode):
+- Middle mouse or Shift + left mouse: paint.
+- Right mouse: erase.
+- Ctrl + left mouse: pan.
+- `+` / `-`: zoom in / out.
+- `[` / `]`: decrease / increase brush size.
+- `r`: reset mask to empty.
 - `s`: save mask and exit.
 - `q` or `ESC`: quit without saving.
 

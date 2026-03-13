@@ -247,6 +247,47 @@ def apply_object_removal(
     )
 
 
+def apply_cutout(
+    image: np.ndarray, cfg: dict[str, Any], config_path: Path
+) -> np.ndarray:
+    mask_path = cfg.get("mask_path")
+    if not isinstance(mask_path, str) or not mask_path:
+        raise ValueError("cutout.mask_path must be a non-empty string.")
+
+    mask_file = Path(mask_path)
+    if not mask_file.is_absolute():
+        mask_file = (config_path.parent / mask_file).resolve()
+
+    mask = cv2.imread(str(mask_file), cv2.IMREAD_GRAYSCALE)
+    if mask is None:
+        raise ValueError(f"Failed to read cutout mask: {mask_file}")
+
+    h, w = image.shape[:2]
+    if mask.shape[:2] != (h, w):
+        mask = cv2.resize(mask, (w, h), interpolation=cv2.INTER_NEAREST)
+
+    threshold = cfg.get("threshold", 128)
+    try:
+        threshold_val = int(threshold)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("cutout.threshold must be an integer.") from exc
+    threshold_val = max(0, min(255, threshold_val))
+
+    invert_mask = bool(cfg.get("invert_mask", False))
+    mask_bin = (mask >= threshold_val).astype(np.uint8) * 255
+    if invert_mask:
+        mask_bin = 255 - mask_bin
+
+    fill_color = cfg.get("fill_color", [0, 0, 0])
+    if not (isinstance(fill_color, list) and len(fill_color) == 3):
+        fill_color = [0, 0, 0]
+    fill_value = tuple(int(max(0, min(255, v))) for v in fill_color)
+
+    out = image.copy()
+    out[mask_bin > 0] = fill_value
+    return out
+
+
 def main() -> int:
     args = parse_args()
     input_path = Path(args.input)
@@ -284,6 +325,12 @@ def main() -> int:
             image = apply_object_removal(
                 image, config["object_removal"], rng, config_path
             )
+        except ValueError as exc:
+            print(str(exc), file=sys.stderr)
+            return 2
+    if isinstance(config.get("cutout"), dict):
+        try:
+            image = apply_cutout(image, config["cutout"], config_path)
         except ValueError as exc:
             print(str(exc), file=sys.stderr)
             return 2
